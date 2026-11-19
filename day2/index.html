@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Y8 Design Project II: Build Day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e3e9ef; --card:#f6f8fa; --white:#fdfdfe;
+  --ink:#3b4049; --soft:#6f7682; --faint:#9aa2ad; --line:#cfd7df;
+  --blue:#2b7fe6; --indigo:#3a2df0; --grad:linear-gradient(100deg,#2b8de6 0%,#3a2df0 100%);
+  --ok:#17a174; --okbg:#e3f5ee; --bad:#d9435a; --badbg:#fbe8eb; --hl:#e6efff;
+  --rise:16px 16px 36px rgba(160,174,194,.55),-12px -12px 30px rgba(255,255,255,.95);
+  --rise-s:8px 8px 18px rgba(160,174,194,.5),-6px -6px 14px rgba(255,255,255,.95);
+  --sink:inset 4px 4px 10px rgba(160,174,194,.45),inset -4px -4px 10px rgba(255,255,255,.9);
+  --mono:Consolas,"Cascadia Mono","Courier New",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.55 Montserrat,system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:rgba(227,233,239,.92);backdrop-filter:blur(8px)}
+.hbar{display:flex;align-items:center;gap:18px;padding:14px 0}
+.brand{font-weight:600;font-size:15px;color:var(--soft);line-height:1.25;min-width:150px}
+.brand b{display:block;color:var(--ink);font-size:17px}
+nav{display:flex;gap:12px;flex:1;justify-content:center;flex-wrap:wrap}
+.tile{width:74px;height:70px;border-radius:24px;border:1.5px solid #8f97a2;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:500;color:var(--soft);position:relative;transition:box-shadow .2s,background .2s}
+.tile svg{width:24px;height:24px;fill:#8a919c}
+.tile.on{background:var(--white);border-color:transparent;box-shadow:var(--rise-s);color:var(--ink)}
+.tile.on svg{fill:var(--blue)}
+.tile .tick{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;background:var(--ok);color:#fff;font-size:12px;line-height:20px;display:none}
+.tile.done .tick{display:block}
+.toggle{display:flex;align-items:center;gap:10px;background:var(--white);border:0;border-radius:999px;padding:6px 6px 6px 14px;box-shadow:var(--rise-s);font-size:13px;font-weight:600;color:var(--soft)}
+.sw{width:58px;height:32px;border-radius:999px;background:#d5dce4;position:relative;box-shadow:var(--sink);transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:var(--white);box-shadow:2px 2px 6px rgba(120,130,150,.5);transition:left .2s}
+.toggle[aria-pressed="true"] .sw{background:var(--grad)}
+.toggle[aria-pressed="true"] .sw::after{left:29px}
+
+/* parts */
+main{padding:18px 0 60px}
+section.part{display:none}
+section.part.on{display:block}
+.card{background:var(--card);border-radius:36px;box-shadow:var(--rise);padding:30px 34px}
+.head{display:flex;align-items:flex-start;gap:18px;margin-bottom:22px}
+.head .t{flex:1}
+.step{font-size:14px;color:var(--soft);font-weight:600}
+h1{font-size:40px;font-weight:500;margin:4px 0 8px;line-height:1.15;letter-spacing:-.01em}
+h2{font-size:30px;font-weight:500;margin:2px 0 6px;line-height:1.2}
+h3{font-size:17px;font-weight:600;margin:0 0 10px}
+.do{margin:0;font-size:16.5px;max-width:70ch;color:var(--ink)}
+.speak{flex:none;width:58px;height:58px;border-radius:50%;border:0;background:var(--white);box-shadow:var(--rise-s);display:grid;place-items:center}
+.speak svg{width:26px;height:26px;fill:var(--blue)}
+.speak.playing{background:var(--grad)}
+.speak.playing svg{fill:#fff}
+
+.pill{border:0;border-radius:999px;padding:13px 30px;font-weight:600;font-size:16px;background:var(--white);box-shadow:var(--rise-s);color:var(--ink)}
+.pill.go{background:var(--grad);color:#fff;box-shadow:8px 10px 22px rgba(58,45,240,.28),-6px -6px 14px rgba(255,255,255,.9)}
+.pill:disabled{opacity:.45;cursor:not-allowed}
+.pill.sm{padding:9px 20px;font-size:14px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.foot{display:flex;justify-content:space-between;margin-top:26px}
+
+/* panels */
+.panel{background:var(--white);border-radius:22px;box-shadow:var(--rise-s);padding:16px 18px;min-width:0}
+.ptitle{font-size:13.5px;font-weight:600;color:var(--soft);margin:0 0 8px}
+.code{font:15px/1.75 var(--mono);margin:0;white-space:pre;overflow-x:auto}
+.code .ln{display:block;border-radius:8px;padding:0 8px;transition:background .2s}
+.code .ln.hl{background:var(--hl);box-shadow:inset 3px 0 0 var(--blue)}
+.code .ln.errl{background:var(--badbg);box-shadow:inset 3px 0 0 var(--bad)}
+.k{color:#3a2df0;font-weight:600}.f{color:#7a3fb8}.s{color:#16835f}.n{color:#c25a00}.cm{color:var(--faint)}
+.pseudo{font:14.5px/1.75 var(--mono);margin:0;white-space:pre}
+.pseudo .ln{display:block;border-radius:8px;padding:0 8px}
+.pseudo .ln.hl{background:var(--hl);box-shadow:inset 3px 0 0 var(--blue)}
+.pk{font-weight:700;color:#3a2df0}
+
+.console{background:#232733;color:#e8ebf2;border-radius:18px;padding:14px 16px;font:14.5px/1.6 var(--mono);min-height:120px;max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.console .in{color:#7fd3ff}
+.console .err{color:#ff8f9f}
+.console .note{color:#9aa3b5;font-style:italic}
+.console .okn{color:#8fe3b8}
+.console input{background:transparent;border:0;border-bottom:1.5px solid #7fd3ff;color:#7fd3ff;font:inherit;width:14ch;outline:none}
+
+/* goals + timeline */
+.goals{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:6px 0 26px}
+.goal{background:var(--white);border-radius:22px;padding:16px 18px;box-shadow:var(--rise-s);display:flex;gap:12px;align-items:flex-start;font-size:15.5px}
+.goal i{flex:none;width:30px;height:30px;border-radius:50%;background:var(--grad);color:#fff;font-style:normal;font-weight:600;display:grid;place-items:center;font-size:14px}
+.brief{background:var(--white);border-radius:22px;padding:16px 20px;box-shadow:var(--sink);margin-bottom:26px;font-size:15.5px}
+.tl{background:var(--white);border-radius:30px;box-shadow:var(--rise-s);padding:30px 30px 18px;margin-bottom:24px}
+.tlbar{position:relative;height:8px;border-radius:8px;background:#d9e0e8;margin:0 40px}
+.tlfill{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:var(--grad);transition:width .4s}
+.tlstops{display:flex;justify-content:space-between;margin:-21px 18px 0;position:relative}
+.stop{display:flex;flex-direction:column;align-items:center;gap:12px;background:none;border:0;padding:0;min-width:70px}
+.dot{width:34px;height:34px;border-radius:50%;background:var(--white);box-shadow:var(--rise-s);display:grid;place-items:center}
+.dot::after{content:"";width:16px;height:16px;border-radius:50%;background:#c3cbd5}
+.stop.done .dot::after{background:var(--grad)}
+.chip{border-radius:14px;padding:7px 14px;font-size:14px;background:var(--white);box-shadow:var(--rise-s);color:var(--soft)}
+.stop.done .chip{background:var(--grad);color:#fff}
+
+/* part 1 */
+.p1grid{display:grid;grid-template-columns:.95fr .8fr 1.25fr;gap:18px;align-items:start}
+.flow svg{width:100%;height:auto;display:block}
+.fn rect,.fn polygon,.fn path{fill:#f1f4f8;stroke:#9aa3ae;stroke-width:1.4;transition:fill .2s,stroke .2s}
+.fn text{font:600 10.5px Montserrat,sans-serif;fill:var(--ink);text-anchor:middle;dominant-baseline:middle}
+.fn.hl rect,.fn.hl polygon,.fn.hl path{fill:#dfe9ff;stroke:var(--indigo);stroke-width:2.4}
+.fl{stroke:#9aa3ae;stroke-width:1.4;fill:none}
+.flab{font:600 9.5px Montserrat,sans-serif;fill:var(--soft)}
+.ctrl{display:grid;grid-template-columns:1fr 1.15fr;gap:18px;margin-top:18px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--soft)}
+.tbox{border:0;border-radius:16px;padding:11px 16px;background:var(--card);box-shadow:var(--sink);font-size:16px;font-weight:500;color:var(--ink);width:100%}
+.topics{display:flex;gap:8px;flex-wrap:wrap}
+.tb{border:0;border-radius:14px;padding:8px 14px;background:var(--white);box-shadow:var(--rise-s);font-size:14.5px;font-weight:500}
+.tb[aria-pressed="true"]{background:var(--grad);color:#fff}
+.found{font-size:14px;color:var(--soft);margin-top:10px}
+
+/* part 2 */
+.tabs{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.tab{border:0;border-radius:20px;padding:12px 20px;background:transparent;border:1.5px solid #9aa2ad;font-weight:600;color:var(--soft);display:flex;align-items:center;gap:10px}
+.tab.on{background:var(--white);border-color:transparent;box-shadow:var(--rise-s);color:var(--ink)}
+.tab .cnt{font-size:12.5px;border-radius:10px;padding:2px 8px;background:#dfe5ec;color:var(--soft)}
+.tab.full .cnt{background:var(--ok);color:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.replies{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.reply{display:flex;align-items:center;gap:10px;border-radius:14px;padding:9px 14px;background:var(--card);box-shadow:var(--sink);font-size:14.5px;color:var(--faint)}
+.reply b{flex:none;width:22px;height:22px;border-radius:50%;background:#d3dae2;display:grid;place-items:center;font-size:12px;color:#fff}
+.reply.got{color:var(--ink);background:var(--okbg);box-shadow:none}
+.reply.got b{background:var(--ok)}
+
+/* part 3 */
+.fill{font:15.5px/2.25 var(--mono);white-space:pre;margin:0;overflow-x:auto}
+.fill select{font:600 15px var(--mono);border:0;border-radius:10px;padding:3px 6px;background:#eef2ff;box-shadow:var(--sink);color:var(--indigo)}
+.fill select.ok{background:var(--okbg);color:var(--ok);box-shadow:none}
+.fill select.no{background:var(--badbg);color:var(--bad);box-shadow:none}
+.msg{margin:14px 0 0;font-weight:600;font-size:15px;min-height:1.4em}
+.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+
+/* part 4 */
+.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.pl{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:14px;box-shadow:var(--rise-s);padding:5px 6px 5px 12px;font:14.5px/1.5 var(--mono);cursor:grab;white-space:pre;user-select:none}
+.pl.drag{opacity:.4}
+.pl.ok{background:var(--okbg);box-shadow:none}
+.pl.no{background:var(--badbg);box-shadow:none}
+.pl .txt{flex:1;min-width:0;overflow-x:auto}
+.two>*,.p1grid>*,.ctrl>*,.goals>*{min-width:0}
+.pl .mv{flex:none;border:0;background:var(--card);border-radius:10px;width:32px;height:30px;box-shadow:var(--rise-s);font-size:14px;color:var(--soft)}
+
+/* part 5 */
+.p5top{display:flex;gap:22px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.ring{position:relative;width:118px;height:118px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;font-size:26px;font-weight:600;color:#7a808a}
+.ring .v small{font-size:13px}
+.bugs{display:flex;gap:10px;flex-wrap:wrap}
+.bt{width:54px;height:54px;border-radius:18px;border:1.5px solid #9aa2ad;background:transparent;font-weight:600;color:var(--soft);position:relative}
+.bt.on{background:var(--white);border-color:transparent;box-shadow:var(--rise-s);color:var(--ink)}
+.bt.done{background:var(--grad);color:#fff;border-color:transparent}
+.ed{display:flex;border-radius:18px;background:var(--white);box-shadow:var(--sink);overflow:hidden}
+.gut{flex:none;padding:12px 0;background:#eef1f5;font:15px/1.7 var(--mono);color:var(--faint);text-align:right;user-select:none}
+.gut span{display:block;padding:0 10px 0 14px}
+.gut span.errl{background:var(--bad);color:#fff}
+.ed textarea{flex:1;border:0;resize:vertical;min-height:150px;padding:12px 14px;font:15px/1.7 var(--mono);background:transparent;outline:none;white-space:pre;overflow-x:auto;tab-size:4}
+.hint{margin-top:12px;border-radius:16px;padding:12px 16px;background:#fff6dd;font-size:15px;display:none}
+.hint.on{display:block}
+
+/* teacher */
+.tnote{display:none}
+body.teacher .tnote{display:block;margin-top:24px;border-radius:22px;padding:16px 20px;background:#fff8e6;border:1.5px dashed #d6a93a;font-size:14.5px}
+.tnote h4{margin:0 0 6px;font-size:14px;color:#9a6b00}
+.tnote p,.tnote li{margin:4px 0}
+.tonly{display:none!important}
+body.teacher .tonly{display:inline-block!important}
+
+.loading{font-size:13.5px;color:var(--soft);margin-left:4px}
+@media (max-width:980px){
+  .p1grid{grid-template-columns:1fr 1fr}.p1grid .pyp{grid-column:1/-1}
+  .two,.ctrl,.goals{grid-template-columns:1fr}
+  .brand{display:none}
+}
+@media (max-width:620px){
+  .wrap{padding:0 14px}.card{padding:22px 18px;border-radius:28px}
+  .p1grid{grid-template-columns:1fr}
+  h1{font-size:30px}h2{font-size:24px}
+  .tile{width:52px;height:52px;border-radius:18px;font-size:0;gap:0}
+  .toggle span.lbl{display:none}
+  .tlbar{margin:0 22px}.tlstops{margin:-21px 0 0}.stop{min-width:0}.chip{font-size:11px;padding:5px 7px}
+  .speak{width:48px;height:48px}
+  .pl{font-size:12.5px}.code,.pseudo,.fill{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+/* y8 additions */
+[hidden]{display:none!important}
+.opts{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+.opt{text-align:left;border:0;border-radius:18px;background:var(--white);box-shadow:var(--rise-s);padding:10px 16px}
+.opt pre{margin:0;font:14.5px/1.6 var(--mono);white-space:pre-wrap}
+.opt.ok{background:var(--okbg);box-shadow:none}.opt.no{background:var(--badbg);box-shadow:none}
+.sorts{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.srow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-radius:14px;padding:8px 10px 8px 14px;background:var(--card);box-shadow:var(--sink);font-size:15px}
+.srow .st{flex:1;min-width:12ch}
+.srow .sb{display:flex;gap:6px;flex-wrap:wrap}
+.srow button{border:0;border-radius:12px;padding:6px 12px;background:var(--white);box-shadow:var(--rise-s);font-size:13.5px;font-weight:600}
+.srow.ok{background:var(--okbg);box-shadow:none}.srow.ok button.on{background:var(--ok);color:#fff}
+.srow.no{background:var(--badbg);box-shadow:none}.srow.no button.on{background:var(--bad);color:#fff}
+.turns{display:flex;flex-direction:column;gap:8px}
+.turn{display:flex;align-items:center;gap:8px}.turn b{min-width:58px;font-size:14px;color:var(--soft)}
+.task{margin:0 0 10px;font-size:15px}
+pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);box-shadow:var(--sink);font:14.5px/1.6 var(--mono);white-space:pre-wrap}
+.code .ln,.pseudo .ln{min-height:1.75em}
+
+/* build day */
+.timer{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:999px;padding:6px 6px 6px 16px;box-shadow:var(--rise-s)}
+.timer b{font-size:20px;font-variant-numeric:tabular-nums;min-width:58px;text-align:center}
+.timer.over b{color:var(--bad)}
+.tbtn{width:36px;height:36px;border-radius:50%;border:0;background:var(--grad);color:#fff;font-size:13px}
+.jobs .goal span small{display:block;color:var(--soft);font-size:13px;margin-top:2px}
+.projs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.proj{text-align:left;border:1.5px solid #9aa2ad;background:transparent;border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.proj b{font-size:18px;font-weight:600}.proj span{font-size:14.5px;color:var(--soft)}
+.proj.on{background:var(--white);border-color:transparent;box-shadow:var(--rise-s)}.proj.on b{color:var(--indigo)}
+.ticks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+#ideas li,#tideas li{position:relative;padding-left:22px;font-size:15.5px}#ideas li::before,#tideas li::before{content:"";position:absolute;left:4px;top:.6em;width:8px;height:8px;border-radius:50%;background:var(--grad)}
+.tk{display:flex;gap:12px;align-items:flex-start;border-radius:14px;padding:9px 12px;background:var(--card);box-shadow:var(--sink);font-size:15.5px;cursor:pointer}
+.tk input{flex:none;width:22px;height:22px;margin:1px 0 0;accent-color:var(--indigo)}
+.tk:has(input:checked){background:var(--okbg);box-shadow:none}
+.count{float:right;font-size:14px;color:var(--soft);font-weight:600}
+.recipes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.rec{background:var(--white);border-radius:22px;box-shadow:var(--rise-s);padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.rec .code{font-size:13.5px;flex:1}
+#starter{font-size:14px}.rec .pill{align-self:flex-start}
+.note{font-size:14px;color:var(--soft);margin:10px 0 0}
+.tblwrap{overflow-x:auto}
+.tt{border-collapse:collapse;width:100%;min-width:720px;font-size:14.5px}
+.tt th{text-align:left;font-size:13px;color:var(--soft);font-weight:600;padding:6px}
+.tt td{padding:4px 6px}.tt td:first-child{width:28px;color:var(--soft);font-weight:600}
+.tt input,.tt select{width:100%;border:0;border-radius:12px;padding:8px 10px;background:var(--card);box-shadow:var(--sink);font:500 14.5px var(--mono)}
+.tt select{font-family:Montserrat,sans-serif}.tt select.yes{background:var(--okbg);color:var(--ok);box-shadow:none}.tt select.no{background:var(--badbg);color:var(--bad);box-shadow:none}
+.five{margin:0;padding-left:1.4em;display:grid;gap:6px;font-size:16px}
+.bugsg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.bug{background:var(--white);border-radius:18px;box-shadow:var(--rise-s);padding:12px 16px}
+.bug summary{cursor:pointer;font-weight:600}.bug summary code{font:600 14px var(--mono);color:var(--bad);white-space:normal}
+.bug p{margin:8px 0 0;font-size:15px}
+.req{font-size:20px;font-weight:600;color:var(--indigo);min-height:2.8em;margin:4px 0 12px}
+.big{font-size:18px;font-weight:600;margin:0 0 12px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,160%);background:var(--ink);color:#fff;border-radius:999px;padding:10px 20px;font-weight:600;font-size:15px;z-index:40;transition:transform .25s;pointer-events:none}
+.toast.show{transform:translate(-50%,0)}
+[hidden]{display:none!important}
+@media (max-width:980px){.projs,.recipes{grid-template-columns:1fr 1fr}.bugsg{grid-template-columns:1fr}}
+@media (max-width:620px){.projs,.recipes{grid-template-columns:1fr}.timer b{font-size:16px;min-width:46px}.timer{padding:4px 4px 4px 10px}}
+</style>
+</head>
+<body>
+<header><div class="wrap hbar">
+  <div class="brand"><b>Design Project II</b>Build day</div>
+  <nav id="nav" aria-label="Lesson parts"></nav>
+  <div class="timer" id="timer"><b id="tm">3:00</b><button class="tbtn" id="tgo" aria-label="Start or pause the timer">▶</button></div>
+</div></header>
+
+<main class="wrap">
+
+<!-- 0 START -->
+<section class="part" id="p0" data-n="0" data-min="3">
+ <div class="card">
+  <div class="head"><div class="t">
+    <div class="step">Year 8 Digital Technologies · Thursday</div>
+    <h1>Build your own project</h1>
+    <p class="do">On Tuesday you practised with our programs. Today you start your own, in VS Code. Follow the six steps on this page, one at a time.</p>
+  </div></div>
+  <div class="brief"><b>Your design brief:</b> a program for a younger class. It can be a revision quiz, a unit converter or a text game. It must have a loop with an if inside it.</div>
+  <h3>Today's six jobs</h3>
+  <div class="goals jobs">
+    <div class="goal"><i>1</i><span><b>Plan.</b> Choose your project and write your plan. <small>5 min</small></span></div>
+    <div class="goal"><i>2</i><span><b>Build.</b> Write the code in VS Code and save version 1. <small>22 min</small></span></div>
+    <div class="goal"><i>3</i><span><b>Test.</b> Try normal, boundary and invalid inputs. <small>8 min</small></span></div>
+    <div class="goal"><i>4</i><span><b>Fix.</b> Use the bug guide when something breaks. <small>any time</small></span></div>
+    <div class="goal"><i>5</i><span><b>Modify.</b> Save version 2, then make one change for the client. <small>10 min</small></span></div>
+    <div class="goal"><i>6</i><span><b>Check.</b> Tick off your milestone list. <small>7 min</small></span></div>
+  </div>
+  <div class="row"><button class="pill go" data-go="1">Start: Plan</button></div>
+  <div class="tnote"><h4>Teacher notes: start (3 min)</h4>
+   <p>Students work individually. Each part has its own timer in the header: press ▶ when you start the part.</p>
+   <p>Before class: check that VS Code opens and runs a .py file on the lab computers (the ▶ Run Python File button, top right). If the Python extension is missing, students can type <code>python quiz_v1.py</code> in the Terminal.</p>
+   <p>Hour plan: Plan 5, Build 22, Test 8, Modify 10, Check 7, plus 3 to start and 5 spare. The Fix part is a reference to open any time.</p>
+  </div>
+ </div>
+</section>
+
+<!-- 1 PLAN -->
+<section class="part" id="p1" data-n="1" data-min="5">
+ <div class="card">
+  <div class="head"><div class="t"><div class="step">Step 1 of 6</div><h2>Choose and plan</h2>
+    <p class="do">Click one project. Copy its plan, then change it to fit your idea. Your plan goes at the top of your file as comments.</p></div></div>
+  <div class="projs" id="projs"></div>
+  <div class="two" style="margin-top:20px">
+    <div class="panel"><p class="ptitle">Your plan (pseudocode)</p><pre class="pseudo" id="plan"></pre>
+      <div class="row" style="margin-top:12px"><button class="pill sm" data-copy="plan">Copy the plan</button></div></div>
+    <div class="panel"><h3>Make it yours</h3><ul class="ticks" id="ideas"></ul></div>
+  </div>
+  <div class="foot"><button class="pill" data-go="0">Back</button><button class="pill go" data-go="2">Next: Build</button></div>
+  <div class="tnote"><h4>Teacher notes: Plan (5 min)</h4>
+   <p>Students who did the homework already have a plan: let them use their own. Everyone else picks a card and copies the plan. Ask each student: "Who is your client, and what is the one thing your program must do for them?"</p>
+  </div>
+ </div>
+</section>
+
+<!-- 2 BUILD -->
+<section class="part" id="p2" data-n="2" data-min="22">
+ <div class="card">
+  <div class="head"><div class="t"><div class="step">Step 2 of 6</div><h2>Build it in VS Code</h2>
+    <p class="do">Tick each step as you finish it. Use the starter code if you need a push, and the code recipes for anything new.</p></div></div>
+  <div class="two">
+    <div class="panel"><h3>Build steps <span class="count" id="cnt2"></span></h3><ul class="ticks" id="steps2"></ul></div>
+    <div class="panel"><p class="ptitle" id="startTitle">Starter code</p><pre class="code" id="starter"></pre>
+      <div class="row" style="margin-top:12px"><button class="pill sm" data-copy="starter">Copy the starter code</button></div>
+      <p class="note">The lines starting with # TODO are yours to write.</p></div>
+  </div>
+  <h3 style="margin-top:24px">Code recipes</h3>
+  <div class="recipes" id="recipes"></div>
+  <div class="foot"><button class="pill" data-go="1">Back</button><button class="pill go" data-go="3">Next: Test</button></div>
+  <div class="tnote"><h4>Teacher notes: Build (22 min)</h4>
+   <p>Walk round with your hands behind your back and ask, don't fix: "What do you expect it to print?", "Which line?", "What did you change?"</p>
+   <p>The milestone for today is a first version that runs, saved as v1. A finished program is not expected yet. Fast finishers: add a recipe they haven't used (random, lower(), break).</p>
+  </div>
+ </div>
+</section>
+
+<!-- 3 TEST -->
+<section class="part" id="p3" data-n="3" data-min="8">
+ <div class="card">
+  <div class="head"><div class="t"><div class="step">Step 3 of 6</div><h2>Test your program</h2>
+    <p class="do">Before you run each test, write what you expect. Then run it and write what really happened. Copy this table into your file as comments, or onto paper.</p></div></div>
+  <div class="panel"><div class="tblwrap"><table class="tt" id="tt"><thead><tr><th>#</th><th>Kind of data</th><th>What I type</th><th>What I expect</th><th>What happened</th><th>Pass?</th></tr></thead><tbody></tbody></table></div>
+    <div class="row" style="margin-top:12px"><button class="pill sm" id="addRow">Add a row</button><button class="pill sm" data-copy="tt">Copy the table as comments</button></div></div>
+  <div class="panel" style="margin-top:18px"><h3>Test ideas for your project</h3><ul class="ticks" id="tideas"></ul></div>
+  <div class="foot"><button class="pill" data-go="2">Back</button><button class="pill go" data-go="4">Next: Fix</button></div>
+  <div class="tnote"><h4>Teacher notes: Test (8 min)</h4>
+   <p>Insist on writing the expected result before running. A test that fails is a good result: it found a bug. Every project should have at least one normal, one boundary and one invalid test.</p>
+   <p>The table saves in the browser on that computer only, so students should also copy it into their file.</p>
+  </div>
+ </div>
+</section>
+
+<!-- 4 FIX -->
+<section class="part" id="p4" data-n="4" data-min="0">
+ <div class="card">
+  <div class="head"><div class="t"><div class="step">Step 4 of 6 · open any time</div><h2>Fix it: the bug guide</h2>
+    <p class="do">Something broke? Follow the five steps first. Then find your error message below and click it.</p></div></div>
+  <div class="panel"><h3>Stuck? Do this</h3><ol class="five"><li>Read the error. Which line?</li><li>What did I expect? What did I get?</li><li>Change <b>one</b> thing.</li><li>Run it again.</li><li>Still stuck? Recipes, your notes, then a classmate, then the teacher.</li></ol></div>
+  <div class="bugsg" id="bugsg"></div>
+  <div class="foot"><button class="pill" data-go="3">Back</button><button class="pill go" data-go="5">Next: Modify</button></div>
+  <div class="tnote"><h4>Teacher notes: Fix</h4>
+   <p>When a student calls you, ask "Which step are you on?" before anything else. Add any new error you see today to the board as the help-desk list for next week.</p>
+  </div>
+ </div>
+</section>
+
+<!-- 5 MODIFY -->
+<section class="part" id="p5" data-n="5" data-min="10">
+ <div class="card">
+  <div class="head"><div class="t"><div class="step">Step 5 of 6</div><h2>Modify for the client</h2>
+    <p class="do">Clients often ask for a change once they try your program. Save first, then change one thing.</p></div></div>
+  <div class="two">
+    <div class="panel"><h3>Do it safely</h3><ul class="ticks" id="steps5"></ul></div>
+    <div class="panel"><h3>Your client request</h3><p class="req" id="req">Press the button to get a request.</p>
+      <div class="row"><button class="pill go sm" id="getReq">Get a client request</button></div>
+      <p class="note">Your teacher may give you a different request. Any one change is fine.</p></div>
+  </div>
+  <div class="foot"><button class="pill" data-go="4">Back</button><button class="pill go" data-go="6">Next: Check</button></div>
+  <div class="tnote"><h4>Teacher notes: Modify (10 min)</h4>
+   <p>This is the deliberate "modify" skill from the topic sequence. Check that each student has two files, v1 and v2. If a change breaks the program, that's fine: they open v1 and try again.</p>
+  </div>
+ </div>
+</section>
+
+<!-- 6 CHECK -->
+<section class="part" id="p6" data-n="6" data-min="7">
+ <div class="card">
+  <div class="head"><div class="t"><div class="step">Step 6 of 6</div><h2>Milestone check</h2>
+    <p class="do">Tick what is true for your program today. Then answer the two questions in a comment at the bottom of your file.</p></div></div>
+  <div class="two">
+    <div class="panel"><h3>My milestone list <span class="count" id="cnt6"></span></h3><ul class="ticks" id="steps6"></ul></div>
+    <div class="panel"><h3>Before you go</h3>
+      <p class="big">1. What was the hardest bug today, and how did you find it?</p>
+      <p class="big">2. What will you add next lesson, and which test will check it?</p>
+      <p class="note">Next week: run your full test table, show your program to a younger user, and evaluate it against your criteria.</p></div>
+  </div>
+  <div class="foot"><button class="pill" data-go="5">Back</button><button class="pill go" data-go="0">Finish</button></div>
+  <div class="tnote"><h4>Teacher notes: Check (7 min)</h4>
+   <p>This is the milestone check against the plan and draft criteria. Walk round and look for: plan comments at the top, v1 and v2 files, and at least three test rows. Students missing v1 by the end need a short catch-up at the start of next lesson.</p>
+  </div>
+ </div>
+</section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem('y8day2_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('y8day2_'+k,JSON.stringify(v))}catch(e){}}};
+const TEACHER=/(^|[?&#])teacher(\b|=|$)/i.test(location.search+location.hash);
+if(TEACHER){document.body.classList.add('teacher');document.title+=' (Teacher)'}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function hlPy(line){
+  if(/^\s*#/.test(line))return `<span class="cm">${esc(line)}</span>`;
+  const re=/(f?"(?:[^"\\]|\\.)*")|(#.*$)|\b(if|elif|else|for|while|in|break|and|not|import)\b|\b(input|print|int|float|round|range|random|lower)\b|\b(\d+)\b/g;
+  let out='',i=0,m;
+  while((m=re.exec(line))){out+=esc(line.slice(i,m.index));
+    if(m[1])out+=`<span class="s">${esc(m[1])}</span>`;else if(m[2])out+=`<span class="cm">${esc(m[2])}</span>`;else if(m[3])out+=`<span class="k">${m[3]}</span>`;
+    else if(m[4])out+=`<span class="f">${m[4]}</span>`;else out+=`<span class="n">${m[5]}</span>`;i=re.lastIndex}
+  return out+esc(line.slice(i));
+}
+const hlPs=l=>esc(l).replace(/\b(INPUT|OUTPUT|IF|THEN|ELSE|END IF|FOR|END FOR|WHILE|END WHILE|FROM|TO|STOP)\b/g,'<span class="pk">$1</span>');
+const codeHTML=(src,fn)=>src.split('\n').map(l=>`<span class="ln">${fn(l)||' '}</span>`).join('');
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),1600)}
+
+/* ---------- projects ---------- */
+const P={
+ quiz:{name:'Revision quiz',for:'A quiz that helps a younger class revise one subject.',file:'quiz',
+  plan:`# Revision quiz for Year 4 (plan)
+# score ← 0
+# FOR each question
+#     INPUT the answer
+#     IF answer = correct answer THEN
+#         OUTPUT "Correct!" and add 1 to score
+#     ELSE
+#         OUTPUT the right answer
+#     END IF
+# END FOR
+# OUTPUT the score and a message`,
+  ideas:['Pick one subject your client needs, for example times tables or Lao words.','Write 3 to 5 questions a younger pupil can answer.','Decide what to print for a perfect score, and for a low score.'],
+  starter:`# Revision quiz for Year 4, version 1
+questions = ["Capital of Laos?", "5 x 6?", "Opposite of hot?"]
+answers = ["vientiane", "30", "cold"]
+score = 0
+
+for i in range(3):
+    guess = input(questions[i] + " ")
+    # TODO: if guess is the same as answers[i]:
+    # TODO:     print Correct! and add 1 to score
+    # TODO: else:
+    # TODO:     print the right answer
+
+print("You scored", score, "out of 3")`,
+  tests:['Normal: type every answer correctly. Expect a full score.','Boundary: get every answer wrong. Expect a score of 0.','Invalid: type "Vientiane" with a capital V. Should it count?','Invalid: press Enter without typing anything.'],
+  reqs:['Add two more questions.','Accept answers typed with capital letters.','Print a special message for a perfect score.','After a wrong answer, give a hint before showing the answer.']},
+ conv:{name:'Unit converter',for:'A converter that helps a younger class with units, money or time.',file:'converter',
+  plan:`# Unit converter (plan)
+# choice ← ""
+# WHILE choice is not "quit"
+#     INPUT choice
+#     IF choice = "1" THEN
+#         INPUT km
+#         IF km < 0 THEN OUTPUT "Can't be negative"
+#         ELSE OUTPUT km in miles
+#     ELSE IF choice = "2" THEN
+#         INPUT the other unit and OUTPUT the answer
+#     ELSE
+#         OUTPUT "Choose again"
+#     END IF
+# END WHILE`,
+  ideas:['Choose units your client really uses, for example kip to dollars, or minutes to hours.','Decide which numbers are not allowed, and what to print for them.','Keep the menu short: two conversions and a quit option.'],
+  starter:`# Unit converter, version 1
+choice = ""
+while choice != "3":
+    choice = input("1 km to miles, 2 C to F, 3 quit: ")
+    # TODO: if choice is "1":
+    # TODO:     ask for km with float(input(...))
+    # TODO:     if km < 0, print Can't be negative
+    # TODO:     else, print the miles
+    # TODO: elif choice is "2": ask for C, print F
+    # TODO: elif choice is "3": print Goodbye
+    # TODO: else: print Choose 1, 2 or 3`,
+  tests:['Normal: choose 1, type 10. Expect 6.21 miles.','Boundary: choose 1, type 0. Expect 0.0 miles.','Invalid: choose 1, type -5. Expect Can\'t be negative.','Invalid: type 9 at the menu. Expect Choose 1, 2 or 3.'],
+  reqs:['Add a third conversion, for example kg to pounds.','Round every answer to 1 decimal place.','Count how many conversions the user made, and print it when they quit.','Reject temperatures colder than -273 °C.']},
+ game:{name:'Text game',for:'A short adventure game a younger class can play in 2 minutes.',file:'game',
+  plan:`# Text game (plan)
+# lives ← 3
+# FOR turn FROM 1 TO 3
+#     INPUT the player's choice
+#     IF choice = the danger THEN
+#         lives ← lives - 1
+#         OUTPUT the lives left
+#         IF lives = 0 THEN
+#             OUTPUT "Game over" and STOP the loop
+#         END IF
+#     ELSE
+#         OUTPUT "Safe"
+#     END IF
+# END FOR
+# OUTPUT the result`,
+  ideas:['Pick a setting your client will like: a jungle, space, a haunted school.','Decide what the danger is and what is safe.','Decide what the player sees when they win.'],
+  starter:`# Text game, version 1
+lives = 3
+for turn in range(3):
+    door = input("Left or right? ")
+    # TODO: if door is "right":
+    # TODO:     take away 1 life and print the lives left
+    # TODO:     if lives is 0: print Game over, then break
+    # TODO: else:
+    # TODO:     print Safe
+
+print("You finished with", lives, "lives")`,
+  tests:['Normal: choose left every time. Expect Safe three times.','Boundary: lose every life. Expect Game over straight after the last one.','Invalid: type "Right" with a capital R. What happens?','Invalid: type a word that is not a door, like "up".'],
+  reqs:['Print "You win!" if the player still has lives at the end.','Add a third door with a different result.','Make the danger door change each time with random.','Add a treasure that gives the player one extra life.']}
+};
+let proj=store.get('proj',null);
+$('#projs').innerHTML=Object.entries(P).map(([k,p])=>`<button class="proj" data-p="${k}"><b>${p.name}</b><span>${p.for}</span></button>`).join('');
+function setProj(k){proj=k;store.set('proj',k);const p=P[k];
+  $$('.proj').forEach(b=>b.classList.toggle('on',b.dataset.p===k));
+  $('#plan').innerHTML=codeHTML(p.plan,l=>hlPs(l.replace(/^# ?/,'')));$('#plan').dataset.raw=p.plan;
+  $('#ideas').innerHTML=p.ideas.map(x=>`<li>${esc(x)}</li>`).join('');
+  $('#starter').innerHTML=codeHTML(p.starter,hlPy);$('#starter').dataset.raw=p.starter;$('#startTitle').textContent='Starter code: '+p.name;
+  $('#tideas').innerHTML=p.tests.map(x=>`<li>${esc(x)}</li>`).join('');
+  ticks('#steps2',BUILD(p),'b2');req();}
+$('#projs').onclick=e=>{const b=e.target.closest('.proj');if(b)setProj(b.dataset.p)};
+
+/* ---------- tick lists ---------- */
+const BUILD=p=>[
+ `Open VS Code. File, then Open Folder: make a folder called <b>design-project</b>.`,
+ `New file, saved as <code>${p.file}_v1.py</code>. The .py ending matters.`,
+ `Paste your plan at the top. Every line starts with #, so Python ignores it.`,
+ `Write the set-up lines: the variables your program starts with.`,
+ `Write the loop. Run it with ▶ (top right) and check it repeats.`,
+ `Put the if inside the loop. Indent it 4 spaces. Run it again.`,
+ `Add the output at the end, with no indent.`,
+ `It runs with no errors. Press Ctrl+S to save version 1.`];
+const MOD=[`File, then Save As: save a copy called <code>…_v2.py</code>. Your v1 file stays safe.`,
+ `Get a client request, or take one from your teacher.`,
+ `Make the change in v2 only. Run it after every small change.`,
+ `Test it again with your test table.`,
+ `Broke it? Open v1, look at what worked, and try again.`];
+const CHECK=[`My plan is at the top of my file as comments.`,`My program has a loop.`,`There is an if inside my loop.`,`It runs with no errors.`,
+ `I tested a normal, a boundary and an invalid input.`,`I saved version 1 before I changed it.`,`I made one client change and saved version 2.`,`My variable names say what they store.`];
+function ticks(sel,items,key){const done=store.get(key,{}),el=$(sel);
+  el.innerHTML=items.map((t,i)=>`<li><label class="tk"><input type="checkbox" data-i="${i}"${done[i]?' checked':''}><span>${t}</span></label></li>`).join('');
+  const c=el.closest('.panel')?.querySelector('.count');
+  const upd=()=>{const n=Object.values(done).filter(Boolean).length;if(c)c.textContent=`${n} / ${items.length}`};upd();
+  el.onchange=e=>{const i=e.target.dataset.i;done[i]=e.target.checked;store.set(key,done);upd();if(e.target.checked&&Object.values(done).filter(Boolean).length===items.length)toast('All done. Well done!')}}
+ticks('#steps5',MOD,'m5');ticks('#steps6',CHECK,'c6');
+
+/* ---------- recipes ---------- */
+const REC=[
+ ['Repeat a set number of times','for i in range(3):\n    print("This runs 3 times")'],
+ ['Repeat until the user quits','choice = ""\nwhile choice != "quit":\n    choice = input("Type quit to stop: ")'],
+ ['Check an answer','if guess == "30":\n    print("Correct!")\nelse:\n    print("It was 30")'],
+ ['Ignore capital letters','guess = input("Capital of Laos? ").lower()\nif guess == "vientiane":\n    print("Correct!")'],
+ ['Keep a score or lives','score = 0\nscore = score + 1\nlives = lives - 1'],
+ ['Turn text into a number','age = int(input("Age: "))\nkm = float(input("Kilometres: "))'],
+ ['Reject a bad number','if km < 0:\n    print("Can\'t be negative")\nelse:\n    print(km * 0.621)'],
+ ['Stop a loop early','if lives == 0:\n    print("Game over")\n    break'],
+ ['Pick something at random','import random\ndanger = random.choice(["left", "right"])\nnumber = random.randint(1, 10)']];
+$('#recipes').innerHTML=REC.map(([t,c],i)=>`<div class="rec"><p class="ptitle">${esc(t)}</p><pre class="code">${codeHTML(c,hlPy)}</pre><button class="pill sm" data-copyi="${i}">Copy</button></div>`).join('');
+
+/* ---------- test table ---------- */
+let rows=store.get('tt',null)||[{k:'Normal'},{k:'Boundary'},{k:'Invalid'}];
+const KINDS=['Normal','Boundary','Invalid'];
+function drawTT(){$('#tt tbody').innerHTML=rows.map((r,i)=>`<tr data-i="${i}"><td>${i+1}</td>
+  <td><select data-f="k">${KINDS.map(k=>`<option${r.k===k?' selected':''}>${k}</option>`).join('')}</select></td>
+  <td><input data-f="in" value="${esc(r.in||'')}" placeholder="10"></td><td><input data-f="ex" value="${esc(r.ex||'')}" placeholder="6.21 miles"></td>
+  <td><input data-f="ac" value="${esc(r.ac||'')}" placeholder="run it first"></td>
+  <td><select data-f="ok"><option value="">?</option><option${r.ok==='Yes'?' selected':''}>Yes</option><option${r.ok==='No'?' selected':''}>No</option></select></td></tr>`).join('')}
+$('#tt').addEventListener('input',e=>{const tr=e.target.closest('tr');if(!tr)return;rows[+tr.dataset.i][e.target.dataset.f]=e.target.value;store.set('tt',rows);if(e.target.dataset.f==='ok')e.target.className=e.target.value==='Yes'?'yes':e.target.value==='No'?'no':''});
+$('#addRow').onclick=()=>{rows.push({k:'Normal'});store.set('tt',rows);drawTT()};
+drawTT();$$('#tt select[data-f="ok"]').forEach(s=>s.className=s.value==='Yes'?'yes':s.value==='No'?'no':'');
+function ttText(){return '# Test table\n# #  | Kind     | I type | I expect | Happened | Pass\n'+rows.map((r,i)=>`# ${i+1}  | ${(r.k||'').padEnd(8)} | ${r.in||''} | ${r.ex||''} | ${r.ac||''} | ${r.ok||''}`).join('\n')}
+
+/* ---------- bug guide ---------- */
+const BUGS=[
+ ['SyntaxError: expected \':\'','The line before the arrow needs a colon at the end. Every for, while, if, elif and else line ends with :'],
+ ['IndentationError: expected an indented block','The line after a colon must be indented 4 spaces (press Tab once).'],
+ ['IndentationError: unexpected indent','A line is indented but should not be. Move it back to line up with the lines around it.'],
+ ['NameError: name \'scroe\' is not defined','A spelling mistake, or the variable is used before it is created. Check the spelling against the line where you made it.'],
+ ['TypeError: \'<\' not supported between \'str\' and \'int\'','input() always gives text. Wrap it: float(input(...)) or int(input(...)).'],
+ ['ValueError: could not convert string to float: \'abc\'','The user typed a word where you need a number. That is an invalid test. For now, write it in your test table as a bug to fix later.'],
+ ['SyntaxError: invalid syntax (on an if line)','You probably used = instead of ==. One = stores a value; == compares two values.'],
+ ['The program never stops','Click in the Terminal and press Ctrl+C. Then check your while line: does the loop ever reach its stop condition?'],
+ ['No error, but the output is wrong','That is a logic error. Compare what happened with your test table, then follow the code one line at a time. Check which lines are inside the loop.']];
+$('#bugsg').innerHTML=BUGS.map(([e,f])=>`<details class="bug"><summary><code>${esc(e)}</code></summary><p>${esc(f)}</p></details>`).join('');
+
+/* ---------- client request ---------- */
+function req(){const r=store.get('req',null);$('#req').textContent=r||'Press the button to get a request.'}
+$('#getReq').onclick=()=>{if(!proj){toast('Choose your project in Step 1 first');return}const list=P[proj].reqs,cur=store.get('req',null);let r;do{r=list[Math.floor(Math.random()*list.length)]}while(r===cur&&list.length>1);store.set('req',r);req()};
+
+/* ---------- copy ---------- */
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-copy],[data-copyi]');if(!b)return;
+  let t='';if(b.dataset.copy==='tt')t=ttText();else if(b.dataset.copy)t=$('#'+b.dataset.copy).dataset.raw||'';else t=REC[+b.dataset.copyi][1];
+  if(!t){toast('Choose your project in Step 1 first');return}
+  try{await navigator.clipboard.writeText(t);toast('Copied. Paste it into VS Code with Ctrl+V.')}catch(err){const r=document.createRange();r.selectNodeContents(b.dataset.copyi!==undefined?b.previousElementSibling:$('#'+b.dataset.copy));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Press Ctrl+C to copy the selected text.')}});
+
+/* ---------- navigation, progress and timer ---------- */
+const NAMES=['Start','Plan','Build','Test','Fix','Modify','Check'];
+const ICONS=['<path d="M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z"/>','<path d="M5 3h10l4 4v14H5zm9 1.5V8h3.5zM8 11h8v1.6H8zm0 3.5h8v1.6H8zm0 3.5h5v1.6H8z"/>','<path d="m13.8 3 1.4 1.4-1.6 1.6 1.4 1.4 1.6-1.6L22 11.2l-1.4 1.4-1.6-1.6-7.8 7.8L4 21l2.2-7.2zM8 15l-1 3.2L10.2 17z"/>',
+ '<path d="M9 2h6v2h-1v5.2l5.6 9.4A2 2 0 0 1 17.9 22H6.1a2 2 0 0 1-1.7-3.4L10 9.2V4H9zm3.5 9h-1l-2.4 4h5.8z"/>','<path d="M14.6 3.2 13.2 5A5 5 0 0 1 16 8h2a7 7 0 0 0-3.4-4.8zM9.4 3.2A7 7 0 0 0 6 8h2a5 5 0 0 1 2.8-3zM7 9v5a5 5 0 0 0 10 0V9zM2 11h4v2H2zm16 0h4v2h-4z"/>',
+ '<path d="M4 17.2V20h2.8l8.3-8.3-2.8-2.8zM19.7 7.1a1 1 0 0 0 0-1.4L18.3 4.3a1 1 0 0 0-1.4 0l-1.2 1.2 2.8 2.8z"/>','<path d="m9.5 16.2-4.2-4.2-1.4 1.4 5.6 5.6 11-11-1.4-1.4z"/>'];
+$('#nav').innerHTML=NAMES.map((n,i)=>`<button class="tile" data-go="${i}" aria-label="${i?'Step '+i+': ':''}${n}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[i]}</svg>${n}</button>`).join('');
+let cur=-1,left=0,tim=null;
+function showT(){const m=Math.floor(Math.abs(left)/60),s=Math.abs(left)%60;$('#tm').textContent=(left<0?'+':'')+`${m}:${String(s).padStart(2,'0')}`;$('#timer').classList.toggle('over',left<0)}
+function stopT(){clearInterval(tim);tim=null;$('#tgo').textContent='▶'}
+$('#tgo').onclick=()=>{if(tim){stopT();return}$('#tgo').textContent='❚❚';tim=setInterval(()=>{left--;showT()},1000)};
+function go(n){n=+n;if(n===cur)return;cur=n;
+  $$('section.part').forEach(s=>s.classList.toggle('on',+s.dataset.n===n));
+  $$('.tile').forEach((t,i)=>{t.classList.toggle('on',i===n);t.toggleAttribute('aria-current',i===n)});
+  const mins=+$(`#p${n}`).dataset.min;$('#timer').hidden=!mins;stopT();left=mins*60;showT();
+  store.set('part',n);window.scrollTo(0,0)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+document.addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight'&&cur<6)go(cur+1);if(e.key==='ArrowLeft'&&cur>0)go(cur-1)});
+if(proj)setProj(proj);else{ticks('#steps2',BUILD({file:'project'}),'b2');$('#plan').innerHTML='<span class="ln">Choose a project above.</span>';$('#starter').innerHTML='<span class="ln">Choose a project in Step 1.</span>'}
+go(store.get('part',0));
+})();
+</script>
+</body>
+</html>
