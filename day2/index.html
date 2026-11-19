@@ -251,6 +251,15 @@ pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);b
 [hidden]{display:none!important}
 @media (max-width:980px){.projs,.recipes{grid-template-columns:1fr 1fr}.bugsg{grid-template-columns:1fr}}
 @media (max-width:620px){.projs,.recipes{grid-template-columns:1fr}.timer b{font-size:16px;min-width:46px}.timer{padding:4px 4px 4px 10px}}
+
+.tip{margin:12px 0 0;border-radius:14px;padding:10px 14px;background:#fff6dd;font-size:15px}
+details.more{margin-top:22px}
+details.more summary{cursor:pointer;display:inline-block;border-radius:999px;padding:11px 22px;background:var(--white);box-shadow:var(--rise-s);font-weight:600;font-size:15px;list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more[open] summary{margin-bottom:16px}
+.tt{min-width:560px}.tt td small{display:block;font-size:12.5px;color:var(--soft);font-weight:500}.tt td:first-child{width:auto;color:var(--ink)}
+.yn{white-space:nowrap}.yn button{width:48px;height:42px;border:0;border-radius:12px;background:var(--white);box-shadow:var(--rise-s);font-size:18px;font-weight:700;margin-right:6px;color:var(--soft)}
+.yn button[data-ok="Yes"].on{background:var(--ok);color:#fff}.yn button[data-ok="No"].on{background:var(--bad);color:#fff}
 </style>
 </head>
 <body>
@@ -268,17 +277,17 @@ pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);b
   <div class="head"><div class="t">
     <div class="step">Year 8 Digital Technologies · Thursday</div>
     <h1>Build your own project</h1>
-    <p class="do">On Tuesday you practised with our programs. Today you start your own, in VS Code. Follow the six steps on this page, one at a time.</p>
+    <p class="do">Today you start your own program in VS Code. Do one step at a time, then press Next.</p>
   </div></div>
   <div class="brief"><b>Your design brief:</b> a program for a younger class. It can be a revision quiz, a unit converter or a text game. It must have a loop with an if inside it.</div>
   <h3>Today's six jobs</h3>
   <div class="goals jobs">
-    <div class="goal"><i>1</i><span><b>Plan.</b> Choose your project and write your plan. <small>5 min</small></span></div>
-    <div class="goal"><i>2</i><span><b>Build.</b> Write the code in VS Code and save version 1. <small>22 min</small></span></div>
-    <div class="goal"><i>3</i><span><b>Test.</b> Try normal, boundary and invalid inputs. <small>8 min</small></span></div>
-    <div class="goal"><i>4</i><span><b>Fix.</b> Use the bug guide when something breaks. <small>any time</small></span></div>
-    <div class="goal"><i>5</i><span><b>Modify.</b> Save version 2, then make one change for the client. <small>10 min</small></span></div>
-    <div class="goal"><i>6</i><span><b>Check.</b> Tick off your milestone list. <small>7 min</small></span></div>
+    <div class="goal"><i>1</i><span><b>Plan:</b> pick a project. <small>5 min</small></span></div>
+    <div class="goal"><i>2</i><span><b>Build:</b> make it work. <small>22 min</small></span></div>
+    <div class="goal"><i>3</i><span><b>Test:</b> try 3 inputs. <small>8 min</small></span></div>
+    <div class="goal"><i>4</i><span><b>Fix:</b> when you see an error. <small>any time</small></span></div>
+    <div class="goal"><i>5</i><span><b>Modify:</b> one change. <small>10 min</small></span></div>
+    <div class="goal"><i>6</i><span><b>Check:</b> what you finished. <small>7 min</small></span></div>
   </div>
   <div class="row"><button class="pill go" data-go="1">Start: Plan</button></div>
   <div class="tnote"><h4>Teacher notes: start (3 min)</h4>
@@ -293,13 +302,10 @@ pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);b
 <section class="part" id="p1" data-n="1" data-min="5">
  <div class="card">
   <div class="head"><div class="t"><div class="step">Step 1 of 6</div><h2>Choose and plan</h2>
-    <p class="do">Click one project. Copy its plan, then change it to fit your idea. Your plan goes at the top of your file as comments.</p></div></div>
+    <p class="do">Click one project. That's all for now: the next steps change to match it.</p></div></div>
   <div class="projs" id="projs"></div>
-  <div class="two" style="margin-top:20px">
-    <div class="panel"><p class="ptitle">Your plan (pseudocode)</p><pre class="pseudo" id="plan"></pre>
-      <div class="row" style="margin-top:12px"><button class="pill sm" data-copy="plan">Copy the plan</button></div></div>
-    <div class="panel"><h3>Make it yours</h3><ul class="ticks" id="ideas"></ul></div>
-  </div>
+  <div class="panel" style="margin-top:20px" id="planBox" hidden><p class="ptitle">Your plan. You will paste it at the top of your file in Step 2.</p><pre class="pseudo" id="plan"></pre>
+    <p class="tip" id="idea"></p></div>
   <div class="foot"><button class="pill" data-go="0">Back</button><button class="pill go" data-go="2">Next: Build</button></div>
   <div class="tnote"><h4>Teacher notes: Plan (5 min)</h4>
    <p>Students who did the homework already have a plan: let them use their own. Everyone else picks a card and copies the plan. Ask each student: "Who is your client, and what is the one thing your program must do for them?"</p>
@@ -311,15 +317,14 @@ pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);b
 <section class="part" id="p2" data-n="2" data-min="22">
  <div class="card">
   <div class="head"><div class="t"><div class="step">Step 2 of 6</div><h2>Build it in VS Code</h2>
-    <p class="do">Tick each step as you finish it. Use the starter code if you need a push, and the code recipes for anything new.</p></div></div>
+    <p class="do">Do the steps in order and tick each one. Copy the starter code, then fill in the <code># TODO</code> lines.</p></div></div>
   <div class="two">
     <div class="panel"><h3>Build steps <span class="count" id="cnt2"></span></h3><ul class="ticks" id="steps2"></ul></div>
     <div class="panel"><p class="ptitle" id="startTitle">Starter code</p><pre class="code" id="starter"></pre>
       <div class="row" style="margin-top:12px"><button class="pill sm" data-copy="starter">Copy the starter code</button></div>
-      <p class="note">The lines starting with # TODO are yours to write.</p></div>
+      <div class="row"><button class="pill sm" id="hintBtn">Show a hint</button></div><p class="tip" id="hintTxt" hidden></p></div>
   </div>
-  <h3 style="margin-top:24px">Code recipes</h3>
-  <div class="recipes" id="recipes"></div>
+  <details class="more"><summary>Need something new? Open the code recipes</summary><div class="recipes" id="recipes"></div></details>
   <div class="foot"><button class="pill" data-go="1">Back</button><button class="pill go" data-go="3">Next: Test</button></div>
   <div class="tnote"><h4>Teacher notes: Build (22 min)</h4>
    <p>Walk round with your hands behind your back and ask, don't fix: "What do you expect it to print?", "Which line?", "What did you change?"</p>
@@ -332,10 +337,10 @@ pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);b
 <section class="part" id="p3" data-n="3" data-min="8">
  <div class="card">
   <div class="head"><div class="t"><div class="step">Step 3 of 6</div><h2>Test your program</h2>
-    <p class="do">Before you run each test, write what you expect. Then run it and write what really happened. Copy this table into your file as comments, or onto paper.</p></div></div>
-  <div class="panel"><div class="tblwrap"><table class="tt" id="tt"><thead><tr><th>#</th><th>Kind of data</th><th>What I type</th><th>What I expect</th><th>What happened</th><th>Pass?</th></tr></thead><tbody></tbody></table></div>
-    <div class="row" style="margin-top:12px"><button class="pill sm" id="addRow">Add a row</button><button class="pill sm" data-copy="tt">Copy the table as comments</button></div></div>
-  <div class="panel" style="margin-top:18px"><h3>Test ideas for your project</h3><ul class="ticks" id="tideas"></ul></div>
+    <p class="do">Do three tests. For each one: write what you expect, run your program, then press ✓ if it matched or ✗ if it did not.</p></div></div>
+  <div class="panel"><div class="tblwrap"><table class="tt" id="tt"><thead><tr><th>Test</th><th>What I type</th><th>What I expect</th><th>Did it match?</th></tr></thead><tbody></tbody></table></div>
+    <p class="tip">✗ is a good result: your test found a bug. Go to Step 4 to fix it.</p>
+    <div class="row" style="margin-top:12px"><button class="pill sm" data-copy="tt">Copy the table into your file</button></div></div>
   <div class="foot"><button class="pill" data-go="2">Back</button><button class="pill go" data-go="4">Next: Fix</button></div>
   <div class="tnote"><h4>Teacher notes: Test (8 min)</h4>
    <p>Insist on writing the expected result before running. A test that fails is a good result: it found a bug. Every project should have at least one normal, one boundary and one invalid test.</p>
@@ -348,8 +353,8 @@ pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);b
 <section class="part" id="p4" data-n="4" data-min="0">
  <div class="card">
   <div class="head"><div class="t"><div class="step">Step 4 of 6 · open any time</div><h2>Fix it: the bug guide</h2>
-    <p class="do">Something broke? Follow the five steps first. Then find your error message below and click it.</p></div></div>
-  <div class="panel"><h3>Stuck? Do this</h3><ol class="five"><li>Read the error. Which line?</li><li>What did I expect? What did I get?</li><li>Change <b>one</b> thing.</li><li>Run it again.</li><li>Still stuck? Recipes, your notes, then a classmate, then the teacher.</li></ol></div>
+    <p class="do">Look at the last line of the red error in the Terminal. Find it below and click it.</p></div></div>
+  <div class="panel"><h3>Stuck? Do this</h3><ol class="five"><li>Read the error. Which line?</li><li>What did I expect? What did I get?</li><li>Change <b>one</b> thing.</li><li>Run it again.</li><li>Still stuck? Ask a classmate, then the teacher.</li></ol></div>
   <div class="bugsg" id="bugsg"></div>
   <div class="foot"><button class="pill" data-go="3">Back</button><button class="pill go" data-go="5">Next: Modify</button></div>
   <div class="tnote"><h4>Teacher notes: Fix</h4>
@@ -362,12 +367,12 @@ pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);b
 <section class="part" id="p5" data-n="5" data-min="10">
  <div class="card">
   <div class="head"><div class="t"><div class="step">Step 5 of 6</div><h2>Modify for the client</h2>
-    <p class="do">Clients often ask for a change once they try your program. Save first, then change one thing.</p></div></div>
+    <p class="do">Your client wants one change. Save a copy first, so you can go back if it breaks.</p></div></div>
   <div class="two">
     <div class="panel"><h3>Do it safely</h3><ul class="ticks" id="steps5"></ul></div>
     <div class="panel"><h3>Your client request</h3><p class="req" id="req">Press the button to get a request.</p>
       <div class="row"><button class="pill go sm" id="getReq">Get a client request</button></div>
-      <p class="note">Your teacher may give you a different request. Any one change is fine.</p></div>
+      </div>
   </div>
   <div class="foot"><button class="pill" data-go="4">Back</button><button class="pill go" data-go="6">Next: Check</button></div>
   <div class="tnote"><h4>Teacher notes: Modify (10 min)</h4>
@@ -380,7 +385,7 @@ pre.want{margin:0;border-radius:18px;padding:12px 16px;background:var(--white);b
 <section class="part" id="p6" data-n="6" data-min="7">
  <div class="card">
   <div class="head"><div class="t"><div class="step">Step 6 of 6</div><h2>Milestone check</h2>
-    <p class="do">Tick what is true for your program today. Then answer the two questions in a comment at the bottom of your file.</p></div></div>
+    <p class="do">Tick what you finished. It's fine if some are not ticked yet.</p></div></div>
   <div class="two">
     <div class="panel"><h3>My milestone list <span class="count" id="cnt6"></span></h3><ul class="ticks" id="steps6"></ul></div>
     <div class="panel"><h3>Before you go</h3>
@@ -508,34 +513,34 @@ print("You finished with", lives, "lives")`,
   tests:['Normal: choose left every time. Expect Safe three times.','Boundary: lose every life. Expect Game over straight after the last one.','Invalid: type "Right" with a capital R. What happens?','Invalid: type a word that is not a door, like "up".'],
   reqs:['Print "You win!" if the player still has lives at the end.','Add a third door with a different result.','Make the danger door change each time with random.','Add a treasure that gives the player one extra life.']}
 };
+const HINTS={quiz:['Inside the loop, start with:  if guess == answers[i]:','Under it, indented once more:  print("Correct!")  then  score = score + 1','Then, lined up with the if:  else:  and under it  print("It was", answers[i])'],
+ conv:['Inside the loop:  if choice == "1":','Under it:  km = float(input("Kilometres: "))  then an if km < 0: with an else:','Then  elif choice == "2":  ...  elif choice == "3":  print("Goodbye")  and  else:'],
+ game:['Inside the loop:  if door == "right":','Under it:  lives = lives - 1  and  print("Dragon! Lives:", lives)','One more level in:  if lives == 0:  print("Game over")  break.  Then  else:  print("Safe")']};
+let hintN=0;
 let proj=store.get('proj',null);
 $('#projs').innerHTML=Object.entries(P).map(([k,p])=>`<button class="proj" data-p="${k}"><b>${p.name}</b><span>${p.for}</span></button>`).join('');
 function setProj(k){proj=k;store.set('proj',k);const p=P[k];
   $$('.proj').forEach(b=>b.classList.toggle('on',b.dataset.p===k));
-  $('#plan').innerHTML=codeHTML(p.plan,l=>hlPs(l.replace(/^# ?/,'')));$('#plan').dataset.raw=p.plan;
-  $('#ideas').innerHTML=p.ideas.map(x=>`<li>${esc(x)}</li>`).join('');
-  $('#starter').innerHTML=codeHTML(p.starter,hlPy);$('#starter').dataset.raw=p.starter;$('#startTitle').textContent='Starter code: '+p.name;
-  $('#tideas').innerHTML=p.tests.map(x=>`<li>${esc(x)}</li>`).join('');
+  $('#planBox').hidden=false;$('#plan').innerHTML=codeHTML(p.plan,l=>hlPs(l.replace(/^# ?/,'')));
+  $('#idea').textContent='Make it yours: '+p.ideas[0];$('#hintTxt').hidden=true;hintN=0;$('#hintBtn').textContent='Show a hint';
+  const full=p.plan+'\n\n'+p.starter;$('#starter').innerHTML=codeHTML(p.starter,hlPy);$('#starter').dataset.raw=full;$('#startTitle').textContent='Starter code: '+p.name;
+  drawTT();
   ticks('#steps2',BUILD(p),'b2');req();}
 $('#projs').onclick=e=>{const b=e.target.closest('.proj');if(b)setProj(b.dataset.p)};
 
 /* ---------- tick lists ---------- */
 const BUILD=p=>[
- `Open VS Code. File, then Open Folder: make a folder called <b>design-project</b>.`,
- `New file, saved as <code>${p.file}_v1.py</code>. The .py ending matters.`,
- `Paste your plan at the top. Every line starts with #, so Python ignores it.`,
- `Write the set-up lines: the variables your program starts with.`,
- `Write the loop. Run it with ▶ (top right) and check it repeats.`,
- `Put the if inside the loop. Indent it 4 spaces. Run it again.`,
- `Add the output at the end, with no indent.`,
- `It runs with no errors. Press Ctrl+S to save version 1.`];
-const MOD=[`File, then Save As: save a copy called <code>…_v2.py</code>. Your v1 file stays safe.`,
- `Get a client request, or take one from your teacher.`,
- `Make the change in v2 only. Run it after every small change.`,
- `Test it again with your test table.`,
- `Broke it? Open v1, look at what worked, and try again.`];
-const CHECK=[`My plan is at the top of my file as comments.`,`My program has a loop.`,`There is an if inside my loop.`,`It runs with no errors.`,
- `I tested a normal, a boundary and an invalid input.`,`I saved version 1 before I changed it.`,`I made one client change and saved version 2.`,`My variable names say what they store.`];
+ `Open VS Code. Make a new file and save it as <code>${p.file}_v1.py</code>`,
+ `Press <b>Copy the starter code</b> and paste it in (Ctrl+V).`,
+ `Press ▶ (top right) to run it. It runs, but it doesn't check anything yet.`,
+ `Replace the <code># TODO</code> lines with real code. Indent the if 4 spaces.`,
+ `Run it again. Fix any red errors with Step 4.`,
+ `It works. Press Ctrl+S to save version 1.`];
+const MOD=[`File, then Save As. Name it <code>…_v2.py</code>`,
+ `Press <b>Get a client request</b>.`,
+ `Make the change in v2. Run it.`,
+ `Broke it? Open v1 and try again.`];
+const CHECK=[`My program has a loop with an if inside it.`,`It runs with no errors.`,`I did my 3 tests.`,`I saved version 1.`,`I made one client change in version 2.`];
 function ticks(sel,items,key){const done=store.get(key,{}),el=$(sel);
   el.innerHTML=items.map((t,i)=>`<li><label class="tk"><input type="checkbox" data-i="${i}"${done[i]?' checked':''}><span>${t}</span></label></li>`).join('');
   const c=el.closest('.panel')?.querySelector('.count');
@@ -543,10 +548,9 @@ function ticks(sel,items,key){const done=store.get(key,{}),el=$(sel);
   el.onchange=e=>{const i=e.target.dataset.i;done[i]=e.target.checked;store.set(key,done);upd();if(e.target.checked&&Object.values(done).filter(Boolean).length===items.length)toast('All done. Well done!')}}
 ticks('#steps5',MOD,'m5');ticks('#steps6',CHECK,'c6');
 
+$('#hintBtn').onclick=()=>{if(!proj){toast('Choose your project in Step 1 first');return}const h=HINTS[proj];$('#hintTxt').hidden=false;$('#hintTxt').textContent=`Hint ${hintN+1} of ${h.length}: `+h[hintN];hintN=(hintN+1)%h.length;$('#hintBtn').textContent='Next hint'};
 /* ---------- recipes ---------- */
 const REC=[
- ['Repeat a set number of times','for i in range(3):\n    print("This runs 3 times")'],
- ['Repeat until the user quits','choice = ""\nwhile choice != "quit":\n    choice = input("Type quit to stop: ")'],
  ['Check an answer','if guess == "30":\n    print("Correct!")\nelse:\n    print("It was 30")'],
  ['Ignore capital letters','guess = input("Capital of Laos? ").lower()\nif guess == "vientiane":\n    print("Correct!")'],
  ['Keep a score or lives','score = 0\nscore = score + 1\nlives = lives - 1'],
@@ -557,29 +561,27 @@ const REC=[
 $('#recipes').innerHTML=REC.map(([t,c],i)=>`<div class="rec"><p class="ptitle">${esc(t)}</p><pre class="code">${codeHTML(c,hlPy)}</pre><button class="pill sm" data-copyi="${i}">Copy</button></div>`).join('');
 
 /* ---------- test table ---------- */
-let rows=store.get('tt',null)||[{k:'Normal'},{k:'Boundary'},{k:'Invalid'}];
-const KINDS=['Normal','Boundary','Invalid'];
-function drawTT(){$('#tt tbody').innerHTML=rows.map((r,i)=>`<tr data-i="${i}"><td>${i+1}</td>
-  <td><select data-f="k">${KINDS.map(k=>`<option${r.k===k?' selected':''}>${k}</option>`).join('')}</select></td>
-  <td><input data-f="in" value="${esc(r.in||'')}" placeholder="10"></td><td><input data-f="ex" value="${esc(r.ex||'')}" placeholder="6.21 miles"></td>
-  <td><input data-f="ac" value="${esc(r.ac||'')}" placeholder="run it first"></td>
-  <td><select data-f="ok"><option value="">?</option><option${r.ok==='Yes'?' selected':''}>Yes</option><option${r.ok==='No'?' selected':''}>No</option></select></td></tr>`).join('')}
-$('#tt').addEventListener('input',e=>{const tr=e.target.closest('tr');if(!tr)return;rows[+tr.dataset.i][e.target.dataset.f]=e.target.value;store.set('tt',rows);if(e.target.dataset.f==='ok')e.target.className=e.target.value==='Yes'?'yes':e.target.value==='No'?'no':''});
-$('#addRow').onclick=()=>{rows.push({k:'Normal'});store.set('tt',rows);drawTT()};
-drawTT();$$('#tt select[data-f="ok"]').forEach(s=>s.className=s.value==='Yes'?'yes':s.value==='No'?'no':'');
-function ttText(){return '# Test table\n# #  | Kind     | I type | I expect | Happened | Pass\n'+rows.map((r,i)=>`# ${i+1}  | ${(r.k||'').padEnd(8)} | ${r.in||''} | ${r.ex||''} | ${r.ac||''} | ${r.ok||''}`).join('\n')}
+let rows=store.get('tt3',null)||[{},{},{}];
+const KINDS=[['Normal','a usual input'],['Boundary','right at the edge'],['Invalid','should be rejected']];
+const PH={quiz:[['every answer right','3 out of 3'],['every answer wrong','0 out of 3'],['Vientiane (capital V)','?']],conv:[['1, then 10','6.21 miles'],['1, then 0','0.0 miles'],['1, then -5',"Can't be negative"]],game:[['left, left, left','Safe x3'],['right, right, right','Game over'],['up','?']]};
+function drawTT(){const ph=PH[proj]||PH.conv;$('#tt tbody').innerHTML=rows.map((r,i)=>`<tr data-i="${i}"><td><b>${KINDS[i][0]}</b><small>${KINDS[i][1]}</small></td>
+  <td><input data-f="in" value="${esc(r.in||'')}" placeholder="${esc(ph[i][0])}"></td><td><input data-f="ex" value="${esc(r.ex||'')}" placeholder="${esc(ph[i][1])}"></td>
+  <td class="yn"><button data-ok="Yes" class="${r.ok==='Yes'?'on':''}" aria-label="Yes, it matched">✓</button><button data-ok="No" class="${r.ok==='No'?'on':''}" aria-label="No, it did not match">✗</button></td></tr>`).join('')}
+$('#tt').addEventListener('input',e=>{const tr=e.target.closest('tr');if(!tr)return;rows[+tr.dataset.i][e.target.dataset.f]=e.target.value;store.set('tt3',rows)});
+$('#tt').addEventListener('click',e=>{const b=e.target.closest('[data-ok]');if(!b)return;const i=+b.closest('tr').dataset.i;rows[i].ok=rows[i].ok===b.dataset.ok?'':b.dataset.ok;store.set('tt3',rows);drawTT()});
+drawTT();
+function ttText(){return '# Test table\n'+rows.map((r,i)=>`# ${KINDS[i][0]}: I type ${r.in||'...'} | I expect ${r.ex||'...'} | matched: ${r.ok||'...'}`).join('\n')}
 
 /* ---------- bug guide ---------- */
 const BUGS=[
- ['SyntaxError: expected \':\'','The line before the arrow needs a colon at the end. Every for, while, if, elif and else line ends with :'],
- ['IndentationError: expected an indented block','The line after a colon must be indented 4 spaces (press Tab once).'],
- ['IndentationError: unexpected indent','A line is indented but should not be. Move it back to line up with the lines around it.'],
- ['NameError: name \'scroe\' is not defined','A spelling mistake, or the variable is used before it is created. Check the spelling against the line where you made it.'],
- ['TypeError: \'<\' not supported between \'str\' and \'int\'','input() always gives text. Wrap it: float(input(...)) or int(input(...)).'],
- ['ValueError: could not convert string to float: \'abc\'','The user typed a word where you need a number. That is an invalid test. For now, write it in your test table as a bug to fix later.'],
- ['SyntaxError: invalid syntax (on an if line)','You probably used = instead of ==. One = stores a value; == compares two values.'],
- ['The program never stops','Click in the Terminal and press Ctrl+C. Then check your while line: does the loop ever reach its stop condition?'],
- ['No error, but the output is wrong','That is a logic error. Compare what happened with your test table, then follow the code one line at a time. Check which lines are inside the loop.']];
+ ['SyntaxError: expected \':\'','Add : at the end of the line. Every for, while, if, elif and else line needs one.'],
+ ['IndentationError: expected an indented block','The line under a colon must start with 4 spaces. Press Tab once.'],
+ ['NameError: name \'scroe\' is not defined','A spelling mistake. Check the name matches where you first made it.'],
+ ['TypeError: \'<\' not supported between \'str\' and \'int\'','input() gives text. Change it to float(input(...)) or int(input(...)).'],
+ ['ValueError: could not convert string to float: \'abc\'','Someone typed a word where you need a number. Write it in your test table as a bug for later.'],
+ ['SyntaxError: invalid syntax','On an if line? You probably used = instead of ==.'],
+ ['The program never stops','Click in the Terminal and press Ctrl+C. Then check your while line can become False.'],
+ ['No error, but the output is wrong','A logic error. Check which lines are inside the loop: is something indented too far, or not far enough?']];
 $('#bugsg').innerHTML=BUGS.map(([e,f])=>`<details class="bug"><summary><code>${esc(e)}</code></summary><p>${esc(f)}</p></details>`).join('');
 
 /* ---------- client request ---------- */
@@ -588,7 +590,7 @@ $('#getReq').onclick=()=>{if(!proj){toast('Choose your project in Step 1 first')
 
 /* ---------- copy ---------- */
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-copy],[data-copyi]');if(!b)return;
-  let t='';if(b.dataset.copy==='tt')t=ttText();else if(b.dataset.copy)t=$('#'+b.dataset.copy).dataset.raw||'';else t=REC[+b.dataset.copyi][1];
+  let t='';if(b.dataset.copy==='tt')t=ttText();else if(b.dataset.copy==='starter'&&!proj)t='';else if(b.dataset.copy)t=$('#'+b.dataset.copy).dataset.raw||'';else t=REC[+b.dataset.copyi][1];
   if(!t){toast('Choose your project in Step 1 first');return}
   try{await navigator.clipboard.writeText(t);toast('Copied. Paste it into VS Code with Ctrl+V.')}catch(err){const r=document.createRange();r.selectNodeContents(b.dataset.copyi!==undefined?b.previousElementSibling:$('#'+b.dataset.copy));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Press Ctrl+C to copy the selected text.')}});
 
@@ -609,7 +611,7 @@ function go(n){n=+n;if(n===cur)return;cur=n;
   store.set('part',n);window.scrollTo(0,0)}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
 document.addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight'&&cur<6)go(cur+1);if(e.key==='ArrowLeft'&&cur>0)go(cur-1)});
-if(proj)setProj(proj);else{ticks('#steps2',BUILD({file:'project'}),'b2');$('#plan').innerHTML='<span class="ln">Choose a project above.</span>';$('#starter').innerHTML='<span class="ln">Choose a project in Step 1.</span>'}
+if(proj)setProj(proj);else{ticks('#steps2',BUILD({file:'project'}),'b2');$('#starter').innerHTML='<span class="ln">Choose a project in Step 1.</span>'}
 go(store.get('part',0));
 })();
 </script>
