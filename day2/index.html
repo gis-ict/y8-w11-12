@@ -260,6 +260,10 @@ details.more[open] summary{margin-bottom:16px}
 .tt{min-width:560px}.tt td small{display:block;font-size:12.5px;color:var(--soft);font-weight:500}.tt td:first-child{width:auto;color:var(--ink)}
 .yn{white-space:nowrap}.yn button{width:48px;height:42px;border:0;border-radius:12px;background:var(--white);box-shadow:var(--rise-s);font-size:18px;font-weight:700;margin-right:6px;color:var(--soft)}
 .yn button[data-ok="Yes"].on{background:var(--ok);color:#fff}.yn button[data-ok="No"].on{background:var(--bad);color:#fff}
+
+.how{margin:0;padding-left:1.2em;display:grid;gap:8px;font-size:15px}
+pre.run{margin:0;background:#232733;color:#e8ebf2;border-radius:18px;padding:12px 16px;font:13.5px/1.6 var(--mono);white-space:pre-wrap;max-height:330px;overflow:auto}
+#exCode{font-size:13.5px}
 </style>
 </head>
 <body>
@@ -324,6 +328,12 @@ details.more[open] summary{margin-bottom:16px}
       <div class="row" style="margin-top:12px"><button class="pill sm" data-copy="starter">Copy the starter code</button></div>
       <div class="row"><button class="pill sm" id="hintBtn">Show a hint</button></div><p class="tip" id="hintTxt" hidden></p></div>
   </div>
+  <details class="more" id="exBox"><summary>Confused? See a finished example</summary>
+    <p class="tip" style="margin-top:0">This is what a finished version could look like. Don't copy it: read it, then build your own one step at a time.</p>
+    <div class="two" style="margin-top:14px">
+      <div class="panel"><p class="ptitle" id="exTitle">Finished example</p><pre class="code" id="exCode"></pre></div>
+      <div class="panel"><h3>How it works</h3><ul class="how" id="exHow"></ul><p class="ptitle" style="margin-top:14px">What it looks like when it runs</p><pre class="run" id="exRun"></pre></div>
+    </div></details>
   <details class="more"><summary>Need something new? Open the code recipes</summary><div class="recipes" id="recipes"></div></details>
   <div class="foot"><button class="pill" data-go="1">Back</button><button class="pill go" data-go="3">Next: Test</button></div>
   <div class="tnote"><h4>Teacher notes: Build (22 min)</h4>
@@ -516,15 +526,17 @@ print("You finished with", lives, "lives")`,
 const HINTS={quiz:['Inside the loop, start with:  if guess == answers[i]:','Under it, indented once more:  print("Correct!")  then  score = score + 1','Then, lined up with the if:  else:  and under it  print("It was", answers[i])'],
  conv:['Inside the loop:  if choice == "1":','Under it:  km = float(input("Kilometres: "))  then an if km < 0: with an else:','Then  elif choice == "2":  ...  elif choice == "3":  print("Goodbye")  and  else:'],
  game:['Inside the loop:  if door == "right":','Under it:  lives = lives - 1  and  print("Dragon! Lives:", lives)','One more level in:  if lives == 0:  print("Game over")  break.  Then  else:  print("Safe")']};
+const EX={"quiz": {"code": "# Laos revision quiz for Year 4\nquestions = [\n    \"What is the capital of Laos?\",\n    \"What is 6 x 7?\",\n    \"Which river runs through Vientiane?\",\n    \"How many days are in a week?\",\n    \"What is the opposite of hot?\"\n]\nanswers = [\"vientiane\", \"42\", \"mekong\", \"7\", \"cold\"]\nscore = 0\n\nprint(\"Welcome to the Year 4 revision quiz!\")\nfor i in range(5):\n    guess = input(questions[i] + \" \").lower()\n    if guess == answers[i]:\n        print(\"Correct!\")\n        score = score + 1\n    else:\n        print(\"Not quite. The answer is\", answers[i])\n\nprint(\"You scored\", score, \"out of 5\")\nif score == 5:\n    print(\"Perfect score! Well done!\")\nelif score >= 3:\n    print(\"Good work. Try again to get all 5.\")\nelse:\n    print(\"Keep revising. You can do it!\")", "run": "Welcome to the Year 4 revision quiz!\nWhat is the capital of Laos? Vientiane\nCorrect!\nWhat is 6 x 7? 42\nCorrect!\nWhich river runs through Vientiane? mekong\nCorrect!\nHow many days are in a week? 8\nNot quite. The answer is 7\nWhat is the opposite of hot? hot\nNot quite. The answer is cold\nYou scored 3 out of 5\nGood work. Try again to get all 5.", "how": ["<b>Two lists:</b> questions[0] goes with answers[0], questions[1] with answers[1], and so on.", "<b>The loop</b> runs 5 times, once for each question. i is 0, 1, 2, 3, then 4.", "<b>The if inside the loop</b> checks each answer. <code>.lower()</code> means \"Vientiane\" and \"vientiane\" both count.", "<b>After the loop</b> (no indent) the score prints once, then an if, elif and else choose the message."]}, "conv": {"code": "# Unit converter for Year 5\nchoice = \"\"\ncount = 0\nwhile choice != \"5\":\n    print(\"1 km to miles   2 C to F   3 kg to pounds   4 hours to minutes   5 quit\")\n    choice = input(\"Choose 1 to 5: \")\n    if choice == \"1\":\n        km = float(input(\"Kilometres: \"))\n        if km < 0:\n            print(\"Distance can't be negative\")\n        else:\n            print(km, \"km =\", round(km * 0.621, 2), \"miles\")\n            count = count + 1\n    elif choice == \"2\":\n        c = float(input(\"Celsius: \"))\n        print(c, \"C =\", round(c * 9 / 5 + 32, 1), \"F\")\n        count = count + 1\n    elif choice == \"3\":\n        kg = float(input(\"Kilograms: \"))\n        if kg < 0:\n            print(\"Weight can't be negative\")\n        else:\n            print(kg, \"kg =\", round(kg * 2.205, 2), \"pounds\")\n            count = count + 1\n    elif choice == \"4\":\n        hours = float(input(\"Hours: \"))\n        print(hours, \"hours =\", hours * 60, \"minutes\")\n        count = count + 1\n    elif choice == \"5\":\n        print(\"Goodbye! You made\", count, \"conversions.\")\n    else:\n        print(\"Please choose 1, 2, 3, 4 or 5\")", "run": "1 km to miles   2 C to F   3 kg to pounds   4 hours to minutes   5 quit\nChoose 1 to 5: 1\nKilometres: 10\n10.0 km = 6.21 miles\n1 km to miles   2 C to F   3 kg to pounds   4 hours to minutes   5 quit\nChoose 1 to 5: 1\nKilometres: -5\nDistance can't be negative\n1 km to miles   2 C to F   3 kg to pounds   4 hours to minutes   5 quit\nChoose 1 to 5: 5\nGoodbye! You made 1 conversions.", "how": ["<b>The while loop</b> keeps showing the menu until the user types 5.", "<b>The if, elif and else</b> choose which conversion to do.", "<b>An if inside an if:</b> for km and kg, a second if rejects negative numbers.", "<b>count</b> goes up by 1 after each conversion, and prints when the user quits."]}, "game": {"code": "# Jungle temple game for Year 3\nlives = 3\ngems = 0\nprint(\"You enter the jungle temple. There are 5 rooms.\")\nfor room in range(5):\n    print(\"Room\", room + 1)\n    door = input(\"Left or right? \").lower()\n    if door == \"right\":\n        lives = lives - 1\n        print(\"A snake bites you! Lives:\", lives)\n        if lives == 0:\n            print(\"Game over\")\n            break\n    elif door == \"left\":\n        gems = gems + 1\n        print(\"You find a gem! Gems:\", gems)\n    else:\n        print(\"That is not a door. You lose this turn.\")\n\nif lives > 0:\n    print(\"You escaped with\", gems, \"gems and\", lives, \"lives. You win!\")", "run": "You enter the jungle temple. There are 5 rooms.\nRoom 1\nLeft or right? left\nYou find a gem! Gems: 1\nRoom 2\nLeft or right? right\nA snake bites you! Lives: 2\nRoom 3\nLeft or right? up\nThat is not a door. You lose this turn.\nRoom 4\nLeft or right? Left\nYou find a gem! Gems: 2\nRoom 5\nLeft or right? left\nYou find a gem! Gems: 3\nYou escaped with 3 gems and 2 lives. You win!", "how": ["<b>The loop</b> runs 5 times, once for each room. room is 0 to 4, so it prints room + 1.", "<b>The if inside the loop</b> checks the door: right loses a life, left finds a gem.", "<b>An if inside the if:</b> when lives reach 0, it prints Game over and <code>break</code> stops the loop.", "<b>After the loop</b> (no indent), the player wins if they still have lives."]}};
 let hintN=0;
 let proj=store.get('proj',null);
 $('#projs').innerHTML=Object.entries(P).map(([k,p])=>`<button class="proj" data-p="${k}"><b>${p.name}</b><span>${p.for}</span></button>`).join('');
-function setProj(k){proj=k;store.set('proj',k);const p=P[k];
+function setProj(k){proj=k;store.set('proj',k);const p=P[k];$('#exBox').hidden=false;
   $$('.proj').forEach(b=>b.classList.toggle('on',b.dataset.p===k));
   $('#planBox').hidden=false;$('#plan').innerHTML=codeHTML(p.plan,l=>hlPs(l.replace(/^# ?/,'')));
   $('#idea').textContent='Make it yours: '+p.ideas[0];$('#hintTxt').hidden=true;hintN=0;$('#hintBtn').textContent='Show a hint';
   const full=p.plan+'\n\n'+p.starter;$('#starter').innerHTML=codeHTML(p.starter,hlPy);$('#starter').dataset.raw=full;$('#startTitle').textContent='Starter code: '+p.name;
   drawTT();
+  const ex=EX[k];$('#exTitle').textContent='Finished example: '+p.name;$('#exCode').innerHTML=codeHTML(ex.code,hlPy);$('#exHow').innerHTML=ex.how.map(x=>`<li>${x}</li>`).join('');$('#exRun').textContent=ex.run;
   ticks('#steps2',BUILD(p),'b2');req();}
 $('#projs').onclick=e=>{const b=e.target.closest('.proj');if(b)setProj(b.dataset.p)};
 
@@ -611,7 +623,7 @@ function go(n){n=+n;if(n===cur)return;cur=n;
   store.set('part',n);window.scrollTo(0,0)}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
 document.addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight'&&cur<6)go(cur+1);if(e.key==='ArrowLeft'&&cur>0)go(cur-1)});
-if(proj)setProj(proj);else{ticks('#steps2',BUILD({file:'project'}),'b2');$('#starter').innerHTML='<span class="ln">Choose a project in Step 1.</span>'}
+if(proj)setProj(proj);else{$('#exBox').hidden=true;ticks('#steps2',BUILD({file:'project'}),'b2');$('#starter').innerHTML='<span class="ln">Choose a project in Step 1.</span>'}
 go(store.get('part',0));
 })();
 </script>
